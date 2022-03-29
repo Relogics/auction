@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use \App\Models\Auction;
+use \App\Models\Bid;
 class auctionAPI extends Controller
 {
     //
@@ -64,20 +65,31 @@ class auctionAPI extends Controller
 
     }
 
-    function get_auction($id=NULL){
-        if($id){
-            $result = Auction::find($id);
-            return $result;
-            
-        }
-        $result=Auction::all();
-        return $result;
+    function get_auction($auction_id=null){
+        return $auction_id?Auction::where('auction_id',$auction_id)->first():Auction::all();
     }
 
     
+    function filter_auction(Request $req){
+        $result=Auction::where([
+            ['commodity_name', $req->commodity_name],
+            ['warehouse_state', $req->warehouse_state],
+            ['auction_status', $req->auction_status]
+        ])->get();
+        return $result;
 
-    function filter_auction($commodity_name, $warehouse_state, $auction_status)
-    {
-        return Auction::where("commodity_name", $commodity_name)->orWhere("warehouse_state", $warehouse_state)->orWhere("auction_status", $auction_status)->get();
+    }
+
+    function get_bids($auction_id){
+        return Bid::where('auction_id', $auction_id)->get();
+    }
+
+
+    function bid_summary($auction_id){
+        $bid_count=Bid::where('auction_id', $auction_id)->count();
+        $bid_max=Bid::where('auction_id', $auction_id)->max('bid_price');
+
+        return ["count"=>$bid_count, "bid_max"=>$bid_max];
+
     }
 }

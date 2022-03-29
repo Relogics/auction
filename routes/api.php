@@ -21,7 +21,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::post('create_auction', [auctionAPI::class, 'add_auction']);
-Route::get('get_auction', [auctionAPI::class, 'get_auction']);
-Route::get('get_auction/{id}', [auctionAPI::class, 'get_auction']);
+Route::get('get_auction/{auction_id?}', [auctionAPI::class, 'get_auction']);
+// Route::get('get_auction', [auctionAPI::class, 'get_auction']);
 
-Route::get('get_auction/{commodity_name}/{warehouse_state}/{auction_status}', [auctionAPI::class, 'filter_auction']);
+Route::post('filter_auction', [auctionAPI::class, 'filter_auction']);
+
+
+Route::GET('bid/{auction_id}', [auctionAPI::class, 'get_bids']);
+Route::GET('bid_summary/{auction_id}', [auctionAPI::class, 'bid_summary']);

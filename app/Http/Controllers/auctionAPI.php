@@ -80,6 +80,20 @@ class auctionAPI extends Controller
 
     }
 
+    function similar($auction_id){
+        $auction=Auction::where('auction_id', $auction_id)->first();
+        $commodity_name=Auction::where('commodity_name', $auction->commodity_name)->get();
+        $warehouse_state=Auction::where('warehouse_state', $auction->warehouse_state)->get();
+
+        return [
+            $auction, $commodity_name, $warehouse_state
+        ];
+
+    }
+
+
+
+
     function get_bids($auction_id){
         return Bid::where('auction_id', $auction_id)->get();
     }
@@ -92,4 +106,82 @@ class auctionAPI extends Controller
         return ["count"=>$bid_count, "bid_max"=>$bid_max];
 
     }
+
+    function place_bid(Request $req){
+
+        $bid = new Bid;
+        $bid->auction_id=$req->auction_id;
+        $bid->bid_price=$req->bid_price;
+        $bid->bid_qty=$req->bid_qty;
+        $bid->user_id=$req->user_id;
+        $bid->bid_time=$req->bid_time;
+
+        $result=$bid->save();
+
+        if($result){
+            return [
+                'status' => [
+                    "code"=>200,
+                    "message"=>"upload successful"
+                ],
+                "bid_id"=>$bid->id
+            ];
+        }
+        else{
+            return[
+                'status' => [
+                    "code"=>500,
+                    "message"=>"upload not successful"
+                ],
+            ];
+        }
+    }
+
+
+    function my_trades($bid_id){
+        $bid = Bid::where('bid_id', $bid_id)->first();
+        
+        $auction_id = $bid->auction_id;
+        $auction= Auction::where('auction_id', $auction_id)->first();
+        return [
+            "commodity_name"=>$auction->commodity_name,
+            "variety"=>$auction->variety_name,
+            "city"=>$auction->warehouse_city,
+            "state"=>$auction->warehouse_state,
+            "auction_id"=>$auction->auction_id,
+            "bid_qty"=>$bid->bid_qty,
+            "bid_price"=>$bid->bid_price,
+            "auction_end_date"=>$auction->auction_end_date_time,
+            "winning_bid_qty"=>$bid->winning_bid_qty
+        ];
+    }
+
+
+
+    function update_payment_advance(Request $req){
+        $bid_id=$req->bid_id;
+        $bid = Bid::where('bid_id',$bid_id)->first();
+        
+        $bid->advance_amount_payment_status=$req->advance_amount_payment_status;
+        
+        $bid->save();
+        return $bid;
+
+        return ["error"=>"update unsuccesfull"];
+
+    }
+
+    function update_payment_full(Request $req){
+        $bid_id=$req->bid_id;
+        $bid = Bid::where('bid_id',$bid_id)->first();
+        
+        $bid->full_amount_payment_status=$req->full_amount_payment_status;
+        
+        $bid->save();
+        return $bid;
+
+        return ["error"=>"update unsuccesfull"];
+
+    }
+
 }

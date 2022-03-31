@@ -38,3 +38,6 @@ Route::GET('bid_detail/{bid_id}', [auctionAPI::class, 'my_trades']);
 
 Route::PUT('bid_advance', [auctionAPI::class, 'update_payment_advance']);
 Route::PUT('bid_full', [auctionAPI::class, 'update_payment_full']);
+
+
+Route::POST('upload_image', [auctionAPI::class, 'upload_image']);

@@ -65,6 +65,19 @@ class auctionAPI extends Controller
 
     }
 
+    function upload_image(Request $req){
+        $result=$req->file('image')->store('auction_images');
+        return ["result"=>$result];
+    }
+
+
+
+
+
+
+
+
+
     function get_auction($auction_id=null){
         return $auction_id?Auction::where('auction_id',$auction_id)->first():Auction::all();
     }
@@ -95,7 +108,7 @@ class auctionAPI extends Controller
 
 
     function get_bids($auction_id){
-        return Bid::where('auction_id', $auction_id)->get();
+        return Bid::where('auction_id', $auction_id)->orderBy('bid_price', 'desc')->get();
     }
 
 
